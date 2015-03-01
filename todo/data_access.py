@@ -16,7 +16,7 @@ def init_db():
                        ''')
 
 
-def add_item(decription):
+def add_item(description):
     '''Add todo item and return the ID that is generated. The
     id may later be used to reference the item.
     '''
@@ -30,6 +30,26 @@ def add_item(decription):
                          completed)
                         VALUES
                          (?,
-                          false)
-                       ''')
+                          0)
+                       ''', (description,))
         return cursor.lastrowid
+
+
+def get_item(rowid):
+    '''Return item that has the provided rowid. If no item is found
+    with that id, return None.
+    '''
+
+    with sqlite3.connect(CONNSTR) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+                       SELECT
+                         description,
+                         completed
+                       FROM
+                         todo_item
+                       WHERE
+                         rowid = ?
+                       ''', (rowid,))
+        row = cursor.fetchone()
+        return row

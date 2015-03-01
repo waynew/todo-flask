@@ -35,3 +35,25 @@ class TestDataAccess(unittest.TestCase):
             fake_conn.cursor.return_value = fake_cursor
 
             self.assertIsNotNone(data_access.add_item("Make this test work"))
+
+    def test_get_item_after_add_item_should_return_inserted_value(self):
+        expected_desc = 'This test is awesome'
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            row_id = data_access.add_item(expected_desc)
+
+            desc, completed = data_access.get_item(row_id)
+
+            self.assertEqual(desc, expected_desc,
+                             "Description should be the one provided")
+            self.assertFalse(completed, 'Completed should be false on new item')
+
+    def test_get_item_with_bogus_rowid_should_return_None(self):
+        expected_desc = 'This test is awesome'
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+
+            self.assertIsNone(data_access.get_item('whatever'),
+                             "Item should be None if not found")
