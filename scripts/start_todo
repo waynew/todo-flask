@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+
+import todo.server as server
+
+print("Hey guys, I has a server!")
