@@ -1,4 +1,6 @@
+import sqlite3
 import unittest
+import tempfile
 import unittest.mock
 import todo.data_access as data_access
 
@@ -11,3 +13,16 @@ class TestDataAccess(unittest.TestCase):
             data_access.init_db()
 
         fake_sqlite.connect.assert_called_once_with(expected_CONNSTR)
+
+
+    def test_when_init_db_is_called_it_should_create_table(self):
+        try:
+            with tempfile.NamedTemporaryFile() as f:
+                data_access.CONNSTR = f.name
+                data_access.init_db()
+
+                with sqlite3.connect(f.name) as conn:
+                    cursor = conn.cursor()
+                    cursor.execute('SELECT * FROM todo_item')
+        except sqlite3.OperationalError:
+            self.fail("Should not have raised sqlite3.OperationalError")
