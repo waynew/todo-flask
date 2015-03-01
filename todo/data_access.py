@@ -102,14 +102,27 @@ def list_items(completed=None):
 
     with sqlite3.connect(CONNSTR) as conn:
         cursor = conn.cursor()
-        cursor.execute('''
-                       SELECT
-                         rowid,
-                         description,
-                         completed
-                       FROM
-                         todo_item
-                       ''')
+        if completed is None:
+            query = ('''
+                     SELECT
+                       rowid,
+                       description,
+                       completed
+                     FROM
+                       todo_item
+                     ''',)
+        else:
+            query = ('''
+                     SELECT
+                       rowid,
+                       description,
+                       completed
+                     FROM
+                       todo_item
+                     WHERE
+                        completed = ?
+                     ''', (completed,))
+        cursor.execute(*query)
         items = []
         for row in cursor.fetchall():
             items.append((row[0],

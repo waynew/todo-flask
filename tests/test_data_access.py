@@ -107,7 +107,6 @@ class TestDataAccess(unittest.TestCase):
 
             self.assertEqual([], data_access.list_items())
 
-
     def test_list_items_with_one_item_should_return_list_with_item(self):
         expected_items = [(1, 'No consequenc', False)]
         with tempfile.NamedTemporaryFile() as f:
@@ -115,5 +114,40 @@ class TestDataAccess(unittest.TestCase):
             data_access.init_db()
             data_access.add_item(expected_items[0][1])
 
-
             self.assertEqual(expected_items, data_access.list_items())
+
+    def test_list_items_with_completed_False_and_all_items_completed_should_return_empty_list(self):
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            id = data_access.add_item('nothing of import')
+            data_access.complete_item(id)
+
+            self.assertEqual([], data_access.list_items(completed=False))
+
+    def test_list_items_with_completed_True_and_all_items_uncompleted_should_return_empty_list(self):
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            id = data_access.add_item('nothing of import')
+
+            self.assertEqual([], data_access.list_items(completed=True))
+
+    def test_list_items_with_uncompleted_items_and_completed_False_should_return_all_items(self):
+        expected_items = [(1, 'No consequenc', False)]
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            data_access.add_item(expected_items[0][1])
+
+            self.assertEqual(expected_items, data_access.list_items(completed=False))
+
+    def test_list_items_with_all_completed_items_and_completed_True_should_return_all_items(self):
+        expected_items = [(1, 'No consequenc', True)]
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            id = data_access.add_item(expected_items[0][1])
+            data_access.complete_item(id)
+
+            self.assertEqual(expected_items, data_access.list_items(completed=True))
