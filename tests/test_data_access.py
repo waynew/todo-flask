@@ -57,3 +57,24 @@ class TestDataAccess(unittest.TestCase):
 
             self.assertIsNone(data_access.get_item('whatever'),
                              "Item should be None if not found")
+
+
+    def test_complete_item_then_get_item_should_be_completed(self):
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            id = data_access.add_item('Not important')
+
+            data_access.complete_item(id)
+
+            _, completed = data_access.get_item(id)
+
+            self.assertTrue(completed, "Item should've been marked complete")
+
+    def test_complete_item_on_bad_id_should_ValueError(self):
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+
+            with self.assertRaises(ValueError):
+                data_access.complete_item(42)

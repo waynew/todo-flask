@@ -35,8 +35,8 @@ def add_item(description):
         return cursor.lastrowid
 
 
-def get_item(rowid):
-    '''Return item that has the provided rowid. If no item is found
+def get_item(id):
+    '''Return item that has the provided id. If no item is found
     with that id, return None.
     '''
 
@@ -50,6 +50,28 @@ def get_item(rowid):
                          todo_item
                        WHERE
                          rowid = ?
-                       ''', (rowid,))
+                       ''', (id,))
         row = cursor.fetchone()
         return row
+
+
+def complete_item(id):
+    '''Mark item completed that matches the provided id. If no item
+    matches that ID, raise KeyError.
+    '''
+
+    with sqlite3.connect(CONNSTR) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+                       UPDATE
+                         todo_item
+                       SET
+                         completed
+                       =
+                         1
+                       WHERE
+                         rowid = ?
+                       ''', (id,))
+
+        if cursor.rowcount == 0:
+            raise ValueError("No todo_item with id <{}>".format(id))
