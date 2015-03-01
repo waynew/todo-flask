@@ -15,3 +15,21 @@ def init_db():
                         )
                        ''')
 
+
+def add_item(decription):
+    '''Add todo item and return the ID that is generated. The
+    id may later be used to reference the item.
+    '''
+
+    with sqlite3.connect(CONNSTR) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+                       INSERT INTO
+                        todo_item
+                        (description,
+                         completed)
+                        VALUES
+                         (?,
+                          false)
+                       ''')
+        return cursor.lastrowid

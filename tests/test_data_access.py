@@ -14,7 +14,6 @@ class TestDataAccess(unittest.TestCase):
 
         fake_sqlite.connect.assert_called_once_with(expected_CONNSTR)
 
-
     def test_when_init_db_is_called_it_should_create_table(self):
         try:
             with tempfile.NamedTemporaryFile() as f:
@@ -26,3 +25,13 @@ class TestDataAccess(unittest.TestCase):
                     cursor.execute('SELECT * FROM todo_item')
         except sqlite3.OperationalError:
             self.fail("Should not have raised sqlite3.OperationalError")
+
+    def test_when_add_item_is_called_it_should_return_an_id(self):
+        expected_rowid = 42
+        with unittest.mock.patch('todo.data_access.sqlite3') as fake_sqlite:
+            fake_conn = unittest.mock.MagicMock()
+            fake_cursor = unittest.mock.MagicMock()
+            fake_sqlite.connect.return_value = fake_conn
+            fake_conn.cursor.return_value = fake_cursor
+
+            self.assertIsNotNone(data_access.add_item("Make this test work"))
