@@ -75,3 +75,20 @@ def complete_item(id):
 
         if cursor.rowcount == 0:
             raise ValueError("No todo_item with id <{}>".format(id))
+
+
+def delete_item(id):
+    '''Delete an item with the provided id. If no item is found with that
+    id, raise ValueError.'''
+
+    with sqlite3.connect(CONNSTR) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+                       DELETE FROM
+                         todo_item
+                       WHERE
+                         rowid = ?
+                       ''', (id,))
+
+        if cursor.rowcount == 0:
+            raise ValueError("No todo_item with id <{}>".format(id))

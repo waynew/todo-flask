@@ -78,3 +78,23 @@ class TestDataAccess(unittest.TestCase):
 
             with self.assertRaises(ValueError):
                 data_access.complete_item(42)
+
+    def test_after_deleting_item_get_item_with_id_should_return_None(self):
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            id = data_access.add_item("Not important")
+
+            data_access.delete_item(id)
+
+            self.assertIsNone(data_access.get_item(id),
+                              'Item should have been deleted')
+
+
+    def test_deleting_not_real_id_should_ValueError(self):
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+
+            with self.assertRaises(ValueError):
+                data_access.delete_item(42)
