@@ -151,3 +151,23 @@ class TestDataAccess(unittest.TestCase):
             data_access.complete_item(id)
 
             self.assertEqual(expected_items, data_access.list_items(completed=True))
+
+    def test_update_item_should_set_description_and_completed_to_provided_values(self):
+        expected_item = ('This is a new desc', 1)
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            id = data_access.add_item("This desc is of no consequence")
+
+            data_access.update_item(id, *expected_item)
+            item = data_access.get_item(id)
+
+            self.assertEqual(expected_item, item)
+
+    def test_update_item_should_ValueError_if_id_does_not_exist(self):
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+
+            with self.assertRaises(ValueError):
+                data_access.update_item(42, 'whatever', True)
