@@ -98,3 +98,22 @@ class TestDataAccess(unittest.TestCase):
 
             with self.assertRaises(ValueError):
                 data_access.delete_item(42)
+
+
+    def test_list_items_with_no_items_added_returns_empty_list(self):
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+
+            self.assertEqual([], data_access.list_items())
+
+
+    def test_list_items_with_one_item_should_return_list_with_item(self):
+        expected_items = [(1, 'No consequenc', False)]
+        with tempfile.NamedTemporaryFile() as f:
+            data_access.CONNSTR = f.name
+            data_access.init_db()
+            data_access.add_item(expected_items[0][1])
+
+
+            self.assertEqual(expected_items, data_access.list_items())

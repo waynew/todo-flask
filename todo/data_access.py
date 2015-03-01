@@ -92,3 +92,28 @@ def delete_item(id):
 
         if cursor.rowcount == 0:
             raise ValueError("No todo_item with id <{}>".format(id))
+
+
+def list_items(completed=None):
+    '''List todo items. If completed is None, return all items. If completed
+    is True, return completed items. If completed is False, return only
+    uncompleted items.
+    '''
+
+    with sqlite3.connect(CONNSTR) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+                       SELECT
+                         rowid,
+                         description,
+                         completed
+                       FROM
+                         todo_item
+                       ''')
+        items = []
+        for row in cursor.fetchall():
+            items.append((row[0],
+                          row[1],
+                          bool(row[2]),
+                          ))
+        return items
